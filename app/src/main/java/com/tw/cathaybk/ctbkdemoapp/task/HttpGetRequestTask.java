@@ -26,9 +26,9 @@ public class HttpGetRequestTask extends AsyncTask<String, Void, String> {
     protected String doInBackground(String... params){
         Log.i("HttpGetRequestTask doInBackground","start");
 
-        id = params[0];
+        id = params[0]; //  for img
         final String stringUrl = params[1];
-        actionType = params[2];
+        actionType = params[2]; //  for img
 
         if( (null == stringUrl || stringUrl.length() == 0) ||
                 (null == actionType || actionType.length() == 0) ||
@@ -49,6 +49,9 @@ public class HttpGetRequestTask extends AsyncTask<String, Void, String> {
             connection.setRequestMethod(REQUEST_METHOD);
             connection.setReadTimeout(READ_TIMEOUT);
             connection.setConnectTimeout(CONNECTION_TIMEOUT);
+
+            //fix java.net.ProtocolException: unexpected end of stream
+            connection.setRequestProperty("Connection", "close");
 
             //Connect to our url
             connection.connect();
@@ -75,16 +78,19 @@ public class HttpGetRequestTask extends AsyncTask<String, Void, String> {
     }
 
     protected void onPostExecute(String result){
-        Log.i("HttpGetRequestTask onPostExecute , result=", result);
-
+        Log.i("HttpGetRequestTask onPostExecute","");
         super.onPostExecute(result);
-        if(actionType.equals("API")){
-            listener.onRequestFinish(result);
-        }else if (actionType.equals("IMG")){
-            listener.onImgRequestFinish(id, result);
+        if( null != result){
+            Log.i("HttpGetRequestTask onPostExecute , result=", result);
+            if(actionType.equals("API")){
+                listener.onRequestFinish(result);
+            }else if (actionType.equals("IMG")){
+                listener.onImgRequestFinish(id, result);
+            }else{
+                listener.onRequestFail("actionType not match");
+            }
         }else{
-            listener.onRequestFail("actionType not match");
+            listener.onRequestFail("result is empty");
         }
-
     }
 }

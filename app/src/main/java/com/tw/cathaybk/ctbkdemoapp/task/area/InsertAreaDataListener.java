@@ -1,4 +1,4 @@
-package com.tw.cathaybk.ctbkdemoapp.task;
+package com.tw.cathaybk.ctbkdemoapp.task.area;
 
 import com.tw.cathaybk.ctbkdemoapp.db.area.AreaData;
 

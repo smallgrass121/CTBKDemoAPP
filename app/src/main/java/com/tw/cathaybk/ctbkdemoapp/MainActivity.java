@@ -1,5 +1,6 @@
 package com.tw.cathaybk.ctbkdemoapp;
 
+import android.app.ListActivity;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
@@ -8,6 +9,7 @@ import androidx.fragment.app.FragmentTransaction;
 public class MainActivity extends AppCompatActivity {
 
     private AreaListActivity areaListActivity = new AreaListActivity();
+    private PlantListActivity plantListActivity = new PlantListActivity();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,8 +24,14 @@ public class MainActivity extends AppCompatActivity {
 //        fragmentTransaction.show(areaListActivity);
 
 
+//        fragmentManager.beginTransaction()
+//                .replace(R.id.fragment_container, areaListActivity, "AreaList")
+//                .setReorderingAllowed(true)
+//                .addToBackStack("name")
+//                .commit();
+
         fragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, areaListActivity, "AreaList")
+                .replace(R.id.fragment_container, plantListActivity, "PlantList")
                 .setReorderingAllowed(true)
                 .addToBackStack("name")
                 .commit();

@@ -100,7 +100,7 @@ public class AreaData {
         }
 
         return "AreaData{" +
-                "E_no=" + E_no +
+                "E_no='" + E_no + '\'' +
                 ", E_Category='" + E_Category + '\'' +
                 ", E_Name='" + E_Name + '\'' +
                 ", E_Pic_URL='" + E_Pic_URL + '\'' +

@@ -2,34 +2,28 @@ package com.tw.cathaybk.ctbkdemoapp;
 
 import android.content.Context;
 import android.os.Bundle;
-
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import com.tw.cathaybk.ctbkdemoapp.db.area.AreaData;
 import com.tw.cathaybk.ctbkdemoapp.task.HttpGetRequestListener;
 import com.tw.cathaybk.ctbkdemoapp.task.HttpGetRequestTask;
-import com.tw.cathaybk.ctbkdemoapp.task.InsertAreaDataListener;
-import com.tw.cathaybk.ctbkdemoapp.task.InsertAreaDataTask;
-import com.tw.cathaybk.ctbkdemoapp.task.InsertAreaImgDataTask;
-import com.tw.cathaybk.ctbkdemoapp.task.InsertImgDataListener;
-import com.tw.cathaybk.ctbkdemoapp.task.SelectAreaDataListener;
-import com.tw.cathaybk.ctbkdemoapp.task.SelectAreaDataTask;
+import com.tw.cathaybk.ctbkdemoapp.task.area.InsertAreaDataListener;
+import com.tw.cathaybk.ctbkdemoapp.task.area.InsertAreaDataTask;
+import com.tw.cathaybk.ctbkdemoapp.task.area.InsertAreaImgDataTask;
+import com.tw.cathaybk.ctbkdemoapp.task.area.InsertImgDataListener;
+import com.tw.cathaybk.ctbkdemoapp.task.area.SelectAreaDataListener;
+import com.tw.cathaybk.ctbkdemoapp.task.area.SelectAreaDataTask;
 import com.tw.cathaybk.ctbkdemoapp.util.CSVFile;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +35,6 @@ public class AreaListActivity extends Fragment
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
-//    private RecyclerView.LayoutManager mLayoutManager;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -126,7 +119,7 @@ public class AreaListActivity extends Fragment
                 areaData = new AreaData();
 
                 for (int i=0; i<areaDataArray.length(); i++) {
-                    Log.i("onInsertAreaDataFinish", areaDataArray.get(i).toString());
+                    Log.i("onRequestFinish", areaDataArray.get(i).toString());
 
                     JSONObject itemObj =  new JSONObject(areaDataArray.get(i).toString());
 

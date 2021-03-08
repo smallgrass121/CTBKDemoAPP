@@ -27,5 +27,5 @@ public interface AreaDataDao {
     List<AreaData> selectAll();
 
     @Query("SELECT image FROM areadata where E_no = :id")
-    String getImageById(int id);
+    String getImageById(String id);
 }
