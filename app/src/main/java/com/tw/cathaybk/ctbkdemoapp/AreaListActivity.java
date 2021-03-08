@@ -1,21 +1,27 @@
 package com.tw.cathaybk.ctbkdemoapp;
 
+import android.content.Context;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
+
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
-import com.tw.cathaybk.ctbkdemoapp.db.AreaData;
-import com.tw.cathaybk.ctbkdemoapp.dummy.DummyContent;
+import com.tw.cathaybk.ctbkdemoapp.db.area.AreaData;
 import com.tw.cathaybk.ctbkdemoapp.task.HttpGetRequestListener;
 import com.tw.cathaybk.ctbkdemoapp.task.HttpGetRequestTask;
 import com.tw.cathaybk.ctbkdemoapp.task.InsertAreaDataListener;
 import com.tw.cathaybk.ctbkdemoapp.task.InsertAreaDataTask;
+import com.tw.cathaybk.ctbkdemoapp.task.InsertAreaImgDataTask;
+import com.tw.cathaybk.ctbkdemoapp.task.InsertImgDataListener;
 import com.tw.cathaybk.ctbkdemoapp.task.SelectAreaDataListener;
 import com.tw.cathaybk.ctbkdemoapp.task.SelectAreaDataTask;
 import com.tw.cathaybk.ctbkdemoapp.util.CSVFile;
@@ -28,29 +34,79 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AreaListActivity extends AppCompatActivity
-        implements HttpGetRequestListener, InsertAreaDataListener, SelectAreaDataListener {
+public class AreaListActivity extends Fragment
+        implements HttpGetRequestListener, InsertAreaDataListener, SelectAreaDataListener, InsertImgDataListener {
 
-    private boolean mTwoPane;
+    private Context context;
+
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mAdapter;
+//    private RecyclerView.LayoutManager mLayoutManager;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_item_list);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        toolbar.setTitle(getTitle());
+        this.context = this.getContext();
+        View view = inflater.inflate(R.layout.activity_area_list, container,false);
 
-        View recyclerView = findViewById(R.id.item_list);
-        assert recyclerView != null;
-        setupRecyclerView((RecyclerView) recyclerView);
+        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+//        ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle(R.string.app_name);
 
-        this.requestAreaAPI();
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
+
+        //temp data
+//        List<AreaData> memberList = new ArrayList();
+//
+//        AreaData ad = new AreaData();
+//        ad.setE_no("1");
+//        ad.setE_Name("1234");
+//        ad.setE_Memo("memo");
+//        ad.setE_Category("1234");
+//        ad.setE_URL("url");
+//        ad.setE_Geo("geo");
+//        ad.setE_Info("info");
+//        ad.setE_Pic_URL("pic");
+//
+//        memberList.add(ad);
+//        mAdapter = new AreaAdapter(context, memberList);
+//        mRecyclerView.setAdapter(mAdapter);
+
+        /***
+         * step 1.  一概透過api取得資料
+         * step 2.  比對response是否與儲存的相同
+         *      2.1 不同則重新下載匯入(step 3)
+         *      2.2 相同則直接使用ROOM資料(step 5)
+         * step 3.  HttpGetRequestTask Call API取得最新版本
+         * step 4.  InsertAreaDataTask insert 最新版本資料
+         *      4.1 下載圖片, 透過 InsertAreaImgDataTask update 儲存圖片, 並更新畫面
+         * step 5.  載入ROOM資料顯示
+         */
+
+        this.requestAreaAPI(getString(R.string.url_area_data_api));
+        //this.checkAreaDataDB();
+
+        return view;
     }
 
-    private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(this, DummyContent.ITEMS, mTwoPane));
+    private void checkAreaDataDB(){
+        new SelectAreaDataTask(context, this).execute();
+    }
+
+    @Override
+    public void onSelectAreaDataFinish(List<AreaData> selectResult) {
+        Log.i("onSelectAreaDataFinish start", "");
+
+        if(null == selectResult || selectResult.size() == 0) {
+            Log.i("onSelectAreaDataFinish", "importCSV");
+            this.importCSV();
+        }else{
+            Log.i("onSelectAreaDataFinish start, selectResult=", selectResult.toString());
+            Log.i("onSelectAreaDataFinish", "setAdapter");
+            mRecyclerView.setAdapter(new AreaAdapter(context, selectResult));
+        }
     }
 
     @Override
@@ -74,20 +130,19 @@ public class AreaListActivity extends AppCompatActivity
 
                     JSONObject itemObj =  new JSONObject(areaDataArray.get(i).toString());
 
-                    AreaData data = new AreaData();
-                    data.setE_no(itemObj.getString("E_no"));
-                    data.setE_Category(itemObj.getString("E_Category"));
-                    data.setE_Name(itemObj.getString("E_Name"));
-                    data.setE_Pic_URL(itemObj.getString("E_Pic_URL"));
-                    data.setE_Info(itemObj.getString("E_Info"));
-                    data.setE_Memo(itemObj.getString("E_Memo"));
-                    data.setE_Geo(itemObj.getString("E_Geo"));
-                    data.setE_URL(itemObj.getString("E_URL"));
+                    areaData.setE_no(itemObj.getString("E_no"));
+                    areaData.setE_Category(itemObj.getString("E_Category"));
+                    areaData.setE_Name(itemObj.getString("E_Name"));
+                    areaData.setE_Pic_URL(itemObj.getString("E_Pic_URL"));
+                    areaData.setE_Info(itemObj.getString("E_Info"));
+                    areaData.setE_Memo(itemObj.getString("E_Memo"));
+                    areaData.setE_Geo(itemObj.getString("E_Geo"));
+                    areaData.setE_URL(itemObj.getString("E_URL"));
 
-                    areaDataList.add(data);
+                    areaDataList.add(areaData);
                 }
                 if(null!= areaDataList && areaDataList.size()>0){
-                    new InsertAreaDataTask(getBaseContext(), this).execute(areaDataList);
+                    new InsertAreaDataTask(context, this).execute(areaDataList);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -98,37 +153,39 @@ public class AreaListActivity extends AppCompatActivity
     }
 
     @Override
+    public void onInsertAreaDataFinish(List<AreaData> selectResult) {
+        Log.i("onInsertAreaDataFinish start, selectResult=", selectResult.toString());
+        mRecyclerView.setAdapter(new AreaAdapter(context, selectResult));
+    }
+
+    @Override
+    public void onImgRequestFinish(String id, String result) {
+        Log.i("onImgRequestFinish start, id=", id.toString());
+        Log.i("onImgRequestFinish start, result=", result.toString());
+        new InsertAreaImgDataTask(context, this).execute(id, result);
+    }
+
+    @Override
     public void onRequestFail(String result) {
+        Log.i("onRequestFail start, result=", result.toString());
         this.checkAreaDataDB();
     }
 
-    @Override
-    public void onInsertAreaDataFinish(List<AreaData> selectResult) {
-
-    }
 
     @Override
     public void onInsertAreaDataFail(String result) {
-
+        Log.i("onInsertAreaDataFail start, result=", result.toString());
     }
 
-    @Override
-    public void onSelectAreaDataFinish(List<AreaData> selectResult) {
-        if(null == selectResult || selectResult.size() > 0){
-            this.importCSV();
-        }
-    }
 
     @Override
     public void onSelectAreaDataFail(String result) {
-
-    }
-
-    private void checkAreaDataDB(){
-        new SelectAreaDataTask(getBaseContext(), this).execute();
+        Log.i("onSelectAreaDataFail start, result=", result.toString());
     }
 
     private void importCSV(){
+        Log.i("importCSV start", "");
+
         InputStream inputStream = getResources().openRawResource(R.raw.areadata_20200206);
         CSVFile csvFile = new CSVFile(inputStream);
         List csvDataList = csvFile.read();
@@ -151,12 +208,29 @@ public class AreaListActivity extends AppCompatActivity
 
             list.add(data);
         }
+        Log.i("importCSV end", "");
         if(list.size()>0){
-            new InsertAreaDataTask(getBaseContext(), this).execute(list);
+            new InsertAreaDataTask(context, this).execute(list);
         }
     }
 
-    private void requestAreaAPI(){
-        new HttpGetRequestTask(this).execute(getString(R.string.url_area_data_api));
+    @Override
+    public void onImgUrlFind(String id, String url) {
+        Log.i("onImgUrlFind start:", "id = "+id+ " url = "+url);
+        new HttpGetRequestTask(this).execute(id, url, "IMG");
+    }
+
+    private void requestAreaAPI(String url){
+        new HttpGetRequestTask(this).execute(null, url, "API");
+    }
+
+    @Override
+    public void onInsertImgDataFinish(List<AreaData> selectResult) {
+        mRecyclerView.setAdapter(new AreaAdapter(context, selectResult));
+    }
+
+    @Override
+    public void onInsertImgDataFail(String result) {
+
     }
 }

@@ -3,9 +3,8 @@ package com.tw.cathaybk.ctbkdemoapp.task;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
-
-import com.tw.cathaybk.ctbkdemoapp.db.AreaData;
-import com.tw.cathaybk.ctbkdemoapp.db.AreaDataDataBase;
+import com.tw.cathaybk.ctbkdemoapp.db.area.AreaData;
+import com.tw.cathaybk.ctbkdemoapp.db.area.AreaDataDataBase;
 
 import java.util.List;
 
@@ -29,6 +28,13 @@ public class InsertAreaDataTask extends AsyncTask<List<AreaData>, Void, List<Are
         try {
             for (int i=0; i<list.size(); i++) {
                 AreaDataDataBase.getInstance(context).getAreaDataDao().insert(list.get(i));
+
+                final String id = list.get(i).getE_no();
+                final String url = list.get(i).getE_Pic_URL();
+//TODO download img
+//                if(null != id && null != url && url.startsWith("http")){
+//                    listener.onImgUrlFind(id, url);
+//                }
             }
         }catch (Exception e) {
             e.printStackTrace();

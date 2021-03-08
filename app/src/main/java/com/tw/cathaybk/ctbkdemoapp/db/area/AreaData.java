@@ -1,4 +1,4 @@
-package com.tw.cathaybk.ctbkdemoapp.db;
+package com.tw.cathaybk.ctbkdemoapp.db.area;
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -16,6 +16,8 @@ public class AreaData {
     private String E_Memo;
     private String E_Geo;
     private String E_URL;
+
+    private String image;
 
     public String getE_no() {
         return E_no;
@@ -81,8 +83,22 @@ public class AreaData {
         E_URL = e_URL;
     }
 
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
     @Override
     public String toString(){
+
+        String imageData = "";
+        if(null != image){
+            imageData = ", image='" + image + '\'' ;
+        }
+
         return "AreaData{" +
                 "E_no=" + E_no +
                 ", E_Category='" + E_Category + '\'' +
@@ -92,6 +108,7 @@ public class AreaData {
                 ", E_Memo='" + E_Memo + '\'' +
                 ", E_Geo='" + E_Geo + '\'' +
                 ", E_URL='" + E_URL + '\'' +
+                imageData +
                 '}';
     }
 }

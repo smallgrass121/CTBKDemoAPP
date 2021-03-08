@@ -15,6 +15,8 @@ public class HttpGetRequestTask extends AsyncTask<String, Void, String> {
     public static final int CONNECTION_TIMEOUT = 15000;
 
     private HttpGetRequestListener listener;
+    private String actionType;
+    private String id = null;
 
     public HttpGetRequestTask(HttpGetRequestListener listener){
         this.listener = listener;
@@ -24,7 +26,17 @@ public class HttpGetRequestTask extends AsyncTask<String, Void, String> {
     protected String doInBackground(String... params){
         Log.i("HttpGetRequestTask doInBackground","start");
 
-        String stringUrl = params[0];
+        id = params[0];
+        final String stringUrl = params[1];
+        actionType = params[2];
+
+        if( (null == stringUrl || stringUrl.length() == 0) ||
+                (null == actionType || actionType.length() == 0) ||
+                ( (actionType.equals("IMG") && (null == id || id.length() == 0) ) )
+        ){
+            listener.onRequestFail("params error");
+        }
+
         String result;
         String inputLine;
         try {
@@ -66,6 +78,13 @@ public class HttpGetRequestTask extends AsyncTask<String, Void, String> {
         Log.i("HttpGetRequestTask onPostExecute , result=", result);
 
         super.onPostExecute(result);
-        listener.onRequestFinish(result);
+        if(actionType.equals("API")){
+            listener.onRequestFinish(result);
+        }else if (actionType.equals("IMG")){
+            listener.onImgRequestFinish(id, result);
+        }else{
+            listener.onRequestFail("actionType not match");
+        }
+
     }
 }

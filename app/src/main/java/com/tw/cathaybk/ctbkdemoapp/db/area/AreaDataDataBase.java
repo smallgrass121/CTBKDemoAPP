@@ -1,12 +1,15 @@
-package com.tw.cathaybk.ctbkdemoapp.db;
+package com.tw.cathaybk.ctbkdemoapp.db.area;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+import androidx.room.migration.Migration;
+import androidx.sqlite.db.SupportSQLiteDatabase;
 
-@Database(entities = {AreaData.class}, version = 1, exportSchema = false)
+@Database(entities = {AreaData.class}, version = 2, exportSchema = false)
 public abstract  class AreaDataDataBase extends RoomDatabase {
     /**
      * 單例模式
@@ -29,10 +32,18 @@ public abstract  class AreaDataDataBase extends RoomDatabase {
                 if (null == INSTANCE){
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                             AreaDataDataBase.class, "AreaData.db")
+                            .addMigrations(MIGRATION_1to2)
                             .build();
                 }
             }
         }
         return INSTANCE;
     }
+
+    public static final Migration MIGRATION_1to2 = new Migration(1, 2) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE areadata ADD COLUMN image TEXT");
+        }
+    };
 }

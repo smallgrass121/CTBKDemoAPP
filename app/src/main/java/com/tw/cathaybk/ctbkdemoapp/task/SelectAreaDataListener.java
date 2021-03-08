@@ -1,6 +1,6 @@
 package com.tw.cathaybk.ctbkdemoapp.task;
 
-import com.tw.cathaybk.ctbkdemoapp.db.AreaData;
+import com.tw.cathaybk.ctbkdemoapp.db.area.AreaData;
 
 import java.util.List;
 

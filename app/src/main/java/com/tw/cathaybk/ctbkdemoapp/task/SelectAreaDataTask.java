@@ -4,8 +4,8 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.tw.cathaybk.ctbkdemoapp.db.AreaData;
-import com.tw.cathaybk.ctbkdemoapp.db.AreaDataDataBase;
+import com.tw.cathaybk.ctbkdemoapp.db.area.AreaData;
+import com.tw.cathaybk.ctbkdemoapp.db.area.AreaDataDataBase;
 
 import java.util.List;
 
@@ -36,9 +36,13 @@ public class SelectAreaDataTask extends AsyncTask<Void, Void, List<AreaData>> {
     }
 
     protected void onPostExecute(List<AreaData> selectResult){
-        Log.i("SelectAreaDataTask onPostExecute , selectResult=",selectResult.toString());
-
+        Log.i("SelectAreaDataTask onPostExecute start", "");
         super.onPostExecute(selectResult);
+        if(null != selectResult){
+            Log.i("SelectAreaDataTask onPostExecute , selectResult=", selectResult.toString());
+        }
+
         listener.onSelectAreaDataFinish(selectResult);
+
     }
 }

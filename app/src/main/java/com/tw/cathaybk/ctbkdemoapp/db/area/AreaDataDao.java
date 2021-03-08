@@ -1,4 +1,4 @@
-package com.tw.cathaybk.ctbkdemoapp.db;
+package com.tw.cathaybk.ctbkdemoapp.db.area;
 
 import androidx.room.Dao;
 import androidx.room.Insert;
@@ -17,9 +17,15 @@ public interface AreaDataDao {
     @Update
     void update(AreaData... data);
 
+    @Query("UPDATE areadata SET image = :image WHERE E_no = :id")
+    void updateImageById(String id, String image);
+
     @Query("DELETE FROM areadata")
     void deleteAll();
 
     @Query("SELECT * FROM areadata")
     List<AreaData> selectAll();
+
+    @Query("SELECT image FROM areadata where E_no = :id")
+    String getImageById(int id);
 }
