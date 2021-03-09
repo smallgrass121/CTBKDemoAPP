@@ -1,10 +1,13 @@
 package com.tw.cathaybk.ctbkdemoapp.db.plant;
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "plantdata")
-public class PlantData {
+public class PlantData implements Parcelable {
     @PrimaryKey
     @NonNull
     private String F_Name_Ch;
@@ -45,6 +48,104 @@ public class PlantData {
     private String F_CID;
 
     private String image;
+
+    public PlantData() {}
+
+    protected PlantData(Parcel in) {
+        F_Name_Ch = in.readString();
+        F_Summary = in.readString();
+        F_Keywords = in.readString();
+        F_AlsoKnown = in.readString();
+        F_Geo = in.readString();
+        F_Location = in.readString();
+        F_Name_En = in.readString();
+        F_Name_Latin = in.readString();
+        F_Family = in.readString();
+        F_Genus = in.readString();
+        F_Brief = in.readString();
+        F_Feature = in.readString();
+        F_FunctionAndApplication = in.readString();
+        F_Code = in.readString();
+        F_Pic01_ALT = in.readString();
+        F_Pic01_URL = in.readString();
+        F_Pic02_ALT = in.readString();
+        F_Pic02_URL = in.readString();
+        F_Pic03_ALT = in.readString();
+        F_Pic03_URL = in.readString();
+        F_Pic04_ALT = in.readString();
+        F_Pic04_URL = in.readString();
+        F_pdf01_ALT = in.readString();
+        F_pdf01_URL = in.readString();
+        F_pdf02_ALT = in.readString();
+        F_pdf02_URL = in.readString();
+        F_Voice01_ALT = in.readString();
+        F_Voice01_URL = in.readString();
+        F_Voice02_ALT = in.readString();
+        F_Voice02_URL = in.readString();
+        F_Voice03_ALT = in.readString();
+        F_Voice03_URL = in.readString();
+        F_Vedio_URL = in.readString();
+        F_Update = in.readString();
+        F_CID = in.readString();
+        image = in.readString();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(F_Name_Ch);
+        dest.writeString(F_Summary);
+        dest.writeString(F_Keywords);
+        dest.writeString(F_AlsoKnown);
+        dest.writeString(F_Geo);
+        dest.writeString(F_Location);
+        dest.writeString(F_Name_En);
+        dest.writeString(F_Name_Latin);
+        dest.writeString(F_Family);
+        dest.writeString(F_Genus);
+        dest.writeString(F_Brief);
+        dest.writeString(F_Feature);
+        dest.writeString(F_FunctionAndApplication);
+        dest.writeString(F_Code);
+        dest.writeString(F_Pic01_ALT);
+        dest.writeString(F_Pic01_URL);
+        dest.writeString(F_Pic02_ALT);
+        dest.writeString(F_Pic02_URL);
+        dest.writeString(F_Pic03_ALT);
+        dest.writeString(F_Pic03_URL);
+        dest.writeString(F_Pic04_ALT);
+        dest.writeString(F_Pic04_URL);
+        dest.writeString(F_pdf01_ALT);
+        dest.writeString(F_pdf01_URL);
+        dest.writeString(F_pdf02_ALT);
+        dest.writeString(F_pdf02_URL);
+        dest.writeString(F_Voice01_ALT);
+        dest.writeString(F_Voice01_URL);
+        dest.writeString(F_Voice02_ALT);
+        dest.writeString(F_Voice02_URL);
+        dest.writeString(F_Voice03_ALT);
+        dest.writeString(F_Voice03_URL);
+        dest.writeString(F_Vedio_URL);
+        dest.writeString(F_Update);
+        dest.writeString(F_CID);
+        dest.writeString(image);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<PlantData> CREATOR = new Creator<PlantData>() {
+        @Override
+        public PlantData createFromParcel(Parcel in) {
+            return new PlantData(in);
+        }
+
+        @Override
+        public PlantData[] newArray(int size) {
+            return new PlantData[size];
+        }
+    };
 
     @NonNull
     public String getF_Name_Ch() {

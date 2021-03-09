@@ -1,6 +1,8 @@
 package com.tw.cathaybk.ctbkdemoapp;
 
 import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,8 +12,10 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.tw.cathaybk.ctbkdemoapp.db.area.AreaData;
 import com.tw.cathaybk.ctbkdemoapp.db.plant.PlantData;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PlantAdapter extends RecyclerView.Adapter<PlantAdapter.ViewHolder> {
@@ -31,9 +35,9 @@ public class PlantAdapter extends RecyclerView.Adapter<PlantAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(PlantAdapter.ViewHolder holder, int position) {
-        final PlantData plantdata = plantDataList.get(position);
-        final String plantName = plantdata.getF_Name_Ch();
-        final String img = plantdata.getImage();
+        final PlantData plantData = plantDataList.get(position);
+        final String plantName = plantData.getF_Name_Ch();
+        final String img = plantData.getImage();
 
         //TODO set true image
       holder.image.setImageResource(R.mipmap.ic_launcher); //TODO get image
@@ -43,16 +47,26 @@ public class PlantAdapter extends RecyclerView.Adapter<PlantAdapter.ViewHolder> 
 //        );
 
         holder.plantName.setText(plantName);
-        holder.alsoknown.setText(plantdata.getF_AlsoKnown());
+        holder.alsoknown.setText(plantData.getF_AlsoKnown());
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-            Log.i("itemView onClick =", plantName);
-            //TODO pass plantdata
+                Log.i("itemView onClick =", plantName);
+
+                ArrayList<PlantData> data = new ArrayList<PlantData>();
+                data.add(plantData);
+
+                Bundle bundle = new Bundle();
+                bundle.putParcelableArrayList("plantDataList", data);
+
+                Intent intent = new Intent(context, MainActivity.class);
+                intent.putExtra("plantDataBundle", bundle);
+
+                context.startActivity(intent);
+                v.setClickable(false);
             }
         });
-//        this.notifyDataSetChanged();
     }
 
     @Override

@@ -65,7 +65,13 @@ public class PlantListActivity extends Fragment
         if(null == areaData) {
             //TODO show error
         }
+
         plantArea = areaData.getE_Name();
+        //例外資料處理
+        if(plantArea.contains(context.getString(R.string.area_pangolin))){
+            plantArea = context.getString(R.string.area_pangolin);
+        }
+
         if(null == plantArea || plantArea.length() == 0 ) {
             //TODO show error
         }
@@ -160,7 +166,6 @@ public class PlantListActivity extends Fragment
                 JSONArray plantDataArray = resultObj.getJSONArray("results");
 
                 plantDataList = new ArrayList <PlantData>();
-
 
                 for (int i=0; i<plantDataArray.length(); i++) {
                     Log.i("onRequestFinish", plantDataArray.get(i).toString());

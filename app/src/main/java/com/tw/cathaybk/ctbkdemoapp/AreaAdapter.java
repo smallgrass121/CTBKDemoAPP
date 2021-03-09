@@ -72,12 +72,12 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.ViewHolder> {
                 Intent intent = new Intent(context, MainActivity.class);
                 intent.putExtra("areaDataBundle", bundle);
 
-                //例外資料處理
-                if(areaName.contains(context.getString(R.string.area_pangolin))){
-                    intent.putExtra("areaName",context.getString(R.string.area_pangolin));
-                } else {
-                    intent.putExtra("areaName",areaName);
-                }
+//                //例外資料處理
+//                if(areaName.contains(context.getString(R.string.area_pangolin))){
+//                    intent.putExtra("areaName",context.getString(R.string.area_pangolin));
+//                } else {
+//                    intent.putExtra("areaName",areaName);
+//                }
                 context.startActivity(intent);
                 v.setClickable(false);
             }
