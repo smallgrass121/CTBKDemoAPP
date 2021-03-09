@@ -130,6 +130,5 @@ public class MainActivity extends AppCompatActivity {
 
     public void exitApp() {
         this.finishAffinity();
-//        System.exit(0);
     }
 }

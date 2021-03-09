@@ -1,5 +1,6 @@
 package com.tw.cathaybk.ctbkdemoapp;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -57,6 +58,8 @@ public class PlantListActivity extends Fragment
     private RecyclerView.Adapter mAdapter;
 
     private String plantArea;
+
+    private ProgressDialog progress = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -136,11 +139,13 @@ public class PlantListActivity extends Fragment
     }
 
     private void checkPlantDataDB(){
+        showloading();
         new SelectPlantDataTask(context, this).execute(plantArea);
     }
 
     @Override
     public void onSelectPlantDataFinish(List<PlantData> selectResult) {
+        cancelloading();
         Log.i("onSelectPlantDataFinish start", "");
 
         if(null == selectResult || selectResult.size() == 0) {
@@ -155,6 +160,7 @@ public class PlantListActivity extends Fragment
 
     @Override
     public void onRequestFinish(String result) {
+        cancelloading();
         Log.i("onRequestFinish start, result=",result.toString());
 
         if(null != result){
@@ -226,35 +232,38 @@ public class PlantListActivity extends Fragment
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-        }else{
-
         }
     }
 
     @Override
     public void onInsertPlantDataFinish(List<PlantData> selectResult) {
+        cancelloading();
         Log.i("onInsertPlantDataFinish start, selectResult=", selectResult.toString());
         mRecyclerView.setAdapter(new PlantAdapter(context, selectResult));
     }
 
     @Override
     public void onRequestFail(String result) {
+        cancelloading();
         Log.i("onRequestFail start, result=", result.toString());
         this.checkPlantDataDB();
     }
 
     @Override
     public void onInsertPlantDataFail(String result) {
+        cancelloading();
         Log.i("onInsertPlantDataFail start, result=", result.toString());
     }
 
 
     @Override
     public void onSelectPlantDataFail(String result) {
+        cancelloading();
         Log.i("onSelectPlantDataFail start, result=", result.toString());
     }
 
     private void importCSV(){
+        showloading();
         Log.i("importCSV start", "");
 
         InputStream inputStream = getResources().openRawResource(R.raw.plantdata_1090818);
@@ -315,11 +324,14 @@ public class PlantListActivity extends Fragment
 
     @Override
     public void onImgUrlFind(String id, String url) {
+        cancelloading();
+        showloading();
         Log.i("onImgUrlFind start:", "id = "+id+ " url = "+url);
         new DownloadFileTask(context, this).execute("PlantList", id, url);
     }
 
     private void requestPlantAPI(String plantArea, boolean requestAll){
+        showloading();
         StringBuilder sbUrl = new StringBuilder(getString(R.string.url_plant_data_api)).append("&q=").append(plantArea);
         if(!requestAll){
             sbUrl.append("&limit=").append("10");
@@ -329,6 +341,7 @@ public class PlantListActivity extends Fragment
 
     @Override
     public void onDownloadFinish(String name, String path) {
+        cancelloading();
         Log.i("onImgRequestFinish start, id=", name.toString());
         Log.i("onImgRequestFinish start, path=", path);
         new InsertPlantImgDataTask(context, this).execute(name, path);
@@ -336,16 +349,35 @@ public class PlantListActivity extends Fragment
 
     @Override
     public void onInsertImgDataFinish(List<PlantData> selectResult) {
+        cancelloading();
         mRecyclerView.setAdapter(new PlantAdapter(context, selectResult));
     }
 
     @Override
     public void onInsertImgDataFail(String result) {
-
+        cancelloading();
     }
 
     @Override
     public void onDownloadFail(String result) {
+        cancelloading();
+    }
 
+    private void showloading() {
+        if(null == progress){
+            progress = new ProgressDialog(context);
+        }
+
+        if(!progress.isShowing()){
+            progress.setTitle("Loading");
+            progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
+            progress.show();
+        }
+    }
+
+    private void cancelloading() {
+        if(null != progress && progress.isShowing()){
+            progress.dismiss();
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.tw.cathaybk.ctbkdemoapp;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -38,11 +39,13 @@ public class AreaListActivity extends Fragment
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
 
+    private ProgressDialog progress = null;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         this.context = this.getContext();
+        showloading();
         View view = inflater.inflate(R.layout.activity_area_list, container,false);
 
         Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
@@ -71,11 +74,13 @@ public class AreaListActivity extends Fragment
     }
 
     private void checkAreaDataDB(){
+        showloading();
         new SelectAreaDataTask(context, this).execute();
     }
 
     @Override
     public void onSelectAreaDataFinish(List<AreaData> selectResult) {
+        cancelloading();
         Log.i("onSelectAreaDataFinish start", "");
 
         if(null == selectResult || selectResult.size() == 0) {
@@ -128,16 +133,20 @@ public class AreaListActivity extends Fragment
         }else{
             this.importCSV();
         }
+        cancelloading();
     }
 
     @Override
     public void onInsertAreaDataFinish(List<AreaData> selectResult) {
+        showloading();
         Log.i("onInsertAreaDataFinish start, selectResult=", selectResult.toString());
         mRecyclerView.setAdapter(new AreaAdapter(context, selectResult));
     }
 
     @Override
     public void onDownloadFinish(String id, String path) {
+        cancelloading();
+        showloading();
         Log.i("onImgRequestFinish start, id=", id.toString());
         Log.i("onImgRequestFinish start, path=", path);
         new InsertAreaImgDataTask(context, this).execute(id, path);
@@ -145,22 +154,26 @@ public class AreaListActivity extends Fragment
 
     @Override
     public void onRequestFail(String result) {
+        cancelloading();
         Log.i("onRequestFail start, result=", result.toString());
         this.checkAreaDataDB();
     }
 
     @Override
     public void onInsertAreaDataFail(String result) {
+        cancelloading();
         Log.i("onInsertAreaDataFail start, result=", result.toString());
     }
 
 
     @Override
     public void onSelectAreaDataFail(String result) {
+        cancelloading();
         Log.i("onSelectAreaDataFail start, result=", result.toString());
     }
 
     private void importCSV(){
+        showloading();
         Log.i("importCSV start", "");
 
         InputStream inputStream = getResources().openRawResource(R.raw.areadata_20200206);
@@ -193,26 +206,47 @@ public class AreaListActivity extends Fragment
 
     @Override
     public void onImgUrlFind(String id, String url) {
+        showloading();
         Log.i("onImgUrlFind start:", "id = "+id+ " url = "+url);
         new DownloadFileTask(context, this).execute("AreaList", id, url);
     }
 
     private void requestAreaAPI(String url){
+        showloading();
         new HttpGetRequestTask(this).execute(url);
     }
 
     @Override
     public void onInsertImgDataFinish(List<AreaData> selectResult) {
         mRecyclerView.setAdapter(new AreaAdapter(context, selectResult));
+        cancelloading();
     }
 
     @Override
     public void onInsertImgDataFail(String result) {
-
+        cancelloading();
     }
 
     @Override
     public void onDownloadFail(String result) {
+        cancelloading();
+    }
 
+    private void showloading() {
+        if(null == progress){
+            progress = new ProgressDialog(context);
+        }
+
+        if(!progress.isShowing()){
+            progress.setTitle("Loading");
+            progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
+            progress.show();
+        }
+    }
+
+    private void cancelloading() {
+        if(null != progress && progress.isShowing()){
+            progress.dismiss();
+        }
     }
 }
