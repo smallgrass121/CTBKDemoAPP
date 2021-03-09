@@ -117,13 +117,12 @@ public class AreaListActivity extends Fragment
                 JSONArray areaDataArray = resultObj.getJSONArray("results");
 
                 areaDataList = new ArrayList <AreaData>();
-                areaData = new AreaData();
 
                 for (int i=0; i<areaDataArray.length(); i++) {
                     Log.i("onRequestFinish", areaDataArray.get(i).toString());
 
                     JSONObject itemObj =  new JSONObject(areaDataArray.get(i).toString());
-
+                    areaData = new AreaData();
                     areaData.setE_no(itemObj.getString("E_no"));
                     areaData.setE_Category(itemObj.getString("E_Category"));
                     areaData.setE_Name(itemObj.getString("E_Name"));

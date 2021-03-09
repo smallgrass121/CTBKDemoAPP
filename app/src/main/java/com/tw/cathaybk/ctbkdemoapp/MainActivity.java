@@ -119,12 +119,17 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if(areaListActivity.isVisible()){
-
+            exitApp();
         }else if(plantListActivity.isVisible()){
             this.showAreaList();
         }
         else if(plantDetailActivity.isVisible()){
             this.showPlantList(areaListData);
         }
+    }
+
+    public void exitApp() {
+        this.finishAffinity();
+//        System.exit(0);
     }
 }
