@@ -214,7 +214,7 @@ public class AreaListActivity extends Fragment
     @Override
     public void onInsertImgDataFinish(List<AreaData> selectResult) {
         mRecyclerView.setAdapter(new AreaAdapter(context, selectResult));
-        mRecyclerView.notifyAll();
+//        mRecyclerView.notifyAll();
     }
 
     @Override
@@ -228,21 +228,21 @@ public class AreaListActivity extends Fragment
     }
 
     private void showLoading() {
-        if(null == progress){
-            progress = new ProgressDialog(context);
-        }
-
-        if(!progress.isShowing()){
-            progress.setTitle("Loading");
-            progress.setCancelable(false);
-            progress.show();
-        }
+//        if(null == progress){
+//            progress = new ProgressDialog(context);
+//        }
+//
+//        if(!progress.isShowing()){
+//            progress.setTitle("Loading");
+//            progress.setCancelable(false);
+//            progress.show();
+//        }
     }
 
     private void cancelLoading() {
-        if(null != progress && progress.isShowing()){
-            progress.dismiss();
-        }
+//        if(null != progress && progress.isShowing()){
+//            progress.dismiss();
+//        }
     }
 
     public void showErrorDialog() {

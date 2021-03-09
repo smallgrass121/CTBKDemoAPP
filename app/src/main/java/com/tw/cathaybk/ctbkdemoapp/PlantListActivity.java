@@ -344,7 +344,7 @@ public class PlantListActivity extends Fragment
     @Override
     public void onInsertImgDataFinish(List<PlantData> selectResult) {
         mRecyclerView.setAdapter(new PlantAdapter(context, selectResult));
-        mRecyclerView.notifyAll();
+//        mRecyclerView.notifyAll();
         cancelLoading();
     }
 
@@ -359,21 +359,21 @@ public class PlantListActivity extends Fragment
     }
 
     private void showLoading() {
-        if(null == progress){
-            progress = new ProgressDialog(context);
-        }
-
-        if(!progress.isShowing()){
-            progress.setTitle("Loading");
-            progress.setCancelable(false);
-            progress.show();
-        }
+//        if(null == progress){
+//            progress = new ProgressDialog(context);
+//        }
+//
+//        if(!progress.isShowing()){
+//            progress.setTitle("Loading");
+//            progress.setCancelable(false);
+//            progress.show();
+//        }
     }
 
     private void cancelLoading() {
-        if(null != progress && progress.isShowing()){
-            progress.dismiss();
-        }
+//        if(null != progress && progress.isShowing()){
+//            progress.dismiss();
+//        }
     }
 
     public void showErrorDialog() {
