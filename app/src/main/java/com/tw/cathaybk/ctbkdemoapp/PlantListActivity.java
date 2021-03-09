@@ -1,22 +1,24 @@
 package com.tw.cathaybk.ctbkdemoapp;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.NavUtils;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.tw.cathaybk.ctbkdemoapp.db.area.AreaData;
 import com.tw.cathaybk.ctbkdemoapp.db.plant.PlantData;
 import com.tw.cathaybk.ctbkdemoapp.task.HttpGetRequestListener;
 import com.tw.cathaybk.ctbkdemoapp.task.HttpGetRequestTask;
@@ -39,6 +41,9 @@ public class PlantListActivity extends Fragment
 
     private Context context;
 
+    private ImageView areaImage;
+    private TextView areaDetail, areaInfo, arealink;
+
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
 
@@ -51,8 +56,16 @@ public class PlantListActivity extends Fragment
         View view = inflater.inflate(R.layout.activity_plant_list, container,false);
         this.context = this.getContext();
 
-        plantArea =  getArguments().getString("areaName");
+        ArrayList<AreaData> data =  getArguments().getParcelableArrayList("areaDataList");
+        if(null == data || data.size() == 0 ) {
+            //TODO show error
+        }
 
+        final AreaData areaData = data.get(0);
+        if(null == areaData) {
+            //TODO show error
+        }
+        plantArea = areaData.getE_Name();
         if(null == plantArea || plantArea.length() == 0 ) {
             //TODO show error
         }
@@ -61,11 +74,31 @@ public class PlantListActivity extends Fragment
         getActivity().setTitle(plantArea);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
 
-        // Show the Up button in the action bar.
         ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+
+        areaImage = (ImageView) view.findViewById(R.id.iv_area_image);
+        areaDetail = (TextView) view.findViewById(R.id.tv_area_detail);
+        areaInfo = (TextView) view.findViewById(R.id.tv_area_info);
+        arealink = (TextView) view.findViewById(R.id.tv_area_link);
+
+        areaDetail.setText(areaData.getE_Info());
+
+        StringBuilder areaInfoData = new StringBuilder(areaData.getE_Memo()).
+                append("\n").append(areaData.getE_Category());
+        areaInfo.setText(areaInfoData);
+
+        arealink.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setAction(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse(areaData.getE_URL()));
+                startActivity(intent);
+            }
+        });
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(context));

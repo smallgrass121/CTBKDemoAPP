@@ -4,8 +4,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.hardware.Camera;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.List;
 
 public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.ViewHolder> {
@@ -40,9 +43,9 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(AreaAdapter.ViewHolder holder, int position) {
-        final AreaData areadata = areaList.get(position);
-        final String areaName = areadata.getE_Name();
-        final String img = areadata.getImage();
+        final AreaData areaData = areaList.get(position);
+        final String areaName = areaData.getE_Name();
+        final String img = areaData.getImage();
 
         //TODO set true image
       holder.image.setImageResource(R.mipmap.ic_launcher); //TODO get image
@@ -52,15 +55,22 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.ViewHolder> {
 //        );
 
         holder.areaName.setText(areaName);
-        holder.areaDesc.setText(areadata.getE_Info());
-        holder.areaMemo.setText(areadata.getE_Memo());
+        holder.areaDesc.setText(areaData.getE_Info());
+        holder.areaMemo.setText(areaData.getE_Memo());
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.i("itemView onClick =", areaName);
 
+                ArrayList<AreaData> data = new ArrayList<AreaData>();
+                data.add(areaData);
+
+                Bundle bundle = new Bundle();
+                bundle.putParcelableArrayList("areaDataList", data);
+
                 Intent intent = new Intent(context, MainActivity.class);
+                intent.putExtra("areaDataBundle", bundle);
 
                 //例外資料處理
                 if(areaName.contains(context.getString(R.string.area_pangolin))){

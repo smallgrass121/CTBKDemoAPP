@@ -1,10 +1,13 @@
 package com.tw.cathaybk.ctbkdemoapp.db.area;
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "areadata")
-public class AreaData {
+public class AreaData implements Parcelable {
     @PrimaryKey
     @NonNull
     private String E_no;
@@ -18,6 +21,32 @@ public class AreaData {
     private String E_URL;
 
     private String image;
+
+    public AreaData() {}
+
+    public AreaData(Parcel in) {
+        E_no = in.readString();
+        E_Category = in.readString();
+        E_Name = in.readString();
+        E_Pic_URL = in.readString();
+        E_Info = in.readString();
+        E_Memo = in.readString();
+        E_Geo = in.readString();
+        E_URL = in.readString();
+        image = in.readString();
+    }
+
+    public static final Creator<AreaData> CREATOR = new Creator<AreaData>() {
+        @Override
+        public AreaData createFromParcel(Parcel in) {
+            return new AreaData(in);
+        }
+
+        @Override
+        public AreaData[] newArray(int size) {
+            return new AreaData[size];
+        }
+    };
 
     public String getE_no() {
         return E_no;
@@ -110,5 +139,23 @@ public class AreaData {
                 ", E_URL='" + E_URL + '\'' +
                 imageData +
                 '}';
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(E_no);
+        dest.writeString(E_Category);
+        dest.writeString(E_Name);
+        dest.writeString(E_Pic_URL);
+        dest.writeString(E_Info);
+        dest.writeString(E_Memo);
+        dest.writeString(E_Geo);
+        dest.writeString(E_URL);
+        dest.writeString(image);
     }
 }

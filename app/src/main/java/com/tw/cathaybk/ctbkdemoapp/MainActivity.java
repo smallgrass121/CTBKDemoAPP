@@ -1,15 +1,16 @@
 package com.tw.cathaybk.ctbkdemoapp;
 
-import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
+
+import com.tw.cathaybk.ctbkdemoapp.db.area.AreaData;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -22,13 +23,18 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Intent intent = getIntent();
-        String areaName = intent.getStringExtra("areaName");
+        Bundle extras = getIntent().getExtras();
+        Bundle bundle = null;
+        ArrayList<AreaData> data = null;
+        if(null != extras) {
+            bundle = extras.getParcelable("areaDataBundle");
+            data = bundle.getParcelableArrayList("areaDataList");
+        }
 
-        if(null == areaName || areaName.length() == 0) {
+        if(null == data || data.size() == 0) {
             showAreaList();
         }else{
-            showPlantList(areaName);
+            showPlantList(data);
         }
     }
 
@@ -44,12 +50,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void showPlantList(String areaName){
+    private void showPlantList(ArrayList<AreaData> data){
         if(!plantListActivity.isVisible()){
 
-            Bundle arguments = new Bundle();
-            arguments.putString( "areaName" , areaName);
-            plantListActivity.setArguments(arguments);
+            Bundle bundle = new Bundle();
+            bundle.putParcelableArrayList("areaDataList", data);
+            plantListActivity.setArguments(bundle);
 
             fragmentManager.beginTransaction()
                     .replace(R.id.fragment_container, plantListActivity, "PlantList")
