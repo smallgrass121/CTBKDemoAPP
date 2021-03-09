@@ -48,7 +48,6 @@ public class AreaListActivity extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         this.context = this.getContext();
-        showLoading();
         View view = inflater.inflate(R.layout.activity_area_list, container,false);
 
         Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
@@ -76,13 +75,11 @@ public class AreaListActivity extends Fragment
     }
 
     private void checkAreaDataDB(){
-        showLoading();
         new SelectAreaDataTask(context, this).execute();
     }
 
     @Override
     public void onSelectAreaDataFinish(List<AreaData> selectResult) {
-        cancelLoading();
         Log.i("onSelectAreaDataFinish start", "");
 
         if(null == selectResult || selectResult.size() == 0) {
@@ -140,15 +137,12 @@ public class AreaListActivity extends Fragment
 
     @Override
     public void onInsertAreaDataFinish(List<AreaData> selectResult) {
-        showLoading();
         Log.i("onInsertAreaDataFinish start, selectResult=", selectResult.toString());
         mRecyclerView.setAdapter(new AreaAdapter(context, selectResult));
     }
 
     @Override
     public void onDownloadFinish(String id, String path) {
-        cancelLoading();
-        showLoading();
         Log.i("onImgRequestFinish start, id=", id.toString());
         Log.i("onImgRequestFinish start, path=", path);
         new InsertAreaImgDataTask(context, this).execute(id, path);
@@ -176,7 +170,6 @@ public class AreaListActivity extends Fragment
     }
 
     private void importCSV(){
-        showLoading();
         Log.i("importCSV start", "");
 
         InputStream inputStream = getResources().openRawResource(R.raw.areadata_20200206);
@@ -209,7 +202,6 @@ public class AreaListActivity extends Fragment
 
     @Override
     public void onImgUrlFind(String id, String url) {
-        showLoading();
         Log.i("onImgUrlFind start:", "id = "+id+ " url = "+url);
         new DownloadFileTask(context, this).execute("AreaList", id, url);
     }
@@ -222,7 +214,7 @@ public class AreaListActivity extends Fragment
     @Override
     public void onInsertImgDataFinish(List<AreaData> selectResult) {
         mRecyclerView.setAdapter(new AreaAdapter(context, selectResult));
-        cancelLoading();
+        mRecyclerView.notifyAll();
     }
 
     @Override
@@ -242,7 +234,7 @@ public class AreaListActivity extends Fragment
 
         if(!progress.isShowing()){
             progress.setTitle("Loading");
-            progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
+            progress.setCancelable(false);
             progress.show();
         }
     }

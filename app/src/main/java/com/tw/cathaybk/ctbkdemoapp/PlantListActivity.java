@@ -145,7 +145,6 @@ public class PlantListActivity extends Fragment
 
     @Override
     public void onSelectPlantDataFinish(List<PlantData> selectResult) {
-        cancelLoading();
         Log.i("onSelectPlantDataFinish start", "");
 
         if(null == selectResult || selectResult.size() == 0) {
@@ -160,7 +159,6 @@ public class PlantListActivity extends Fragment
 
     @Override
     public void onRequestFinish(String result) {
-        cancelLoading();
         Log.i("onRequestFinish start, result=",result.toString());
 
         if(null != result){
@@ -324,14 +322,11 @@ public class PlantListActivity extends Fragment
 
     @Override
     public void onImgUrlFind(String id, String url) {
-        cancelLoading();
-        showLoading();
         Log.i("onImgUrlFind start:", "id = "+id+ " url = "+url);
         new DownloadFileTask(context, this).execute("PlantList", id, url);
     }
 
     private void requestPlantAPI(String plantArea, boolean requestAll){
-        showLoading();
         StringBuilder sbUrl = new StringBuilder(getString(R.string.url_plant_data_api)).append("&q=").append(plantArea);
         if(!requestAll){
             sbUrl.append("&limit=").append("10");
@@ -341,7 +336,6 @@ public class PlantListActivity extends Fragment
 
     @Override
     public void onDownloadFinish(String name, String path) {
-        cancelLoading();
         Log.i("onImgRequestFinish start, id=", name.toString());
         Log.i("onImgRequestFinish start, path=", path);
         new InsertPlantImgDataTask(context, this).execute(name, path);
@@ -349,8 +343,9 @@ public class PlantListActivity extends Fragment
 
     @Override
     public void onInsertImgDataFinish(List<PlantData> selectResult) {
-        cancelLoading();
         mRecyclerView.setAdapter(new PlantAdapter(context, selectResult));
+        mRecyclerView.notifyAll();
+        cancelLoading();
     }
 
     @Override
@@ -370,7 +365,7 @@ public class PlantListActivity extends Fragment
 
         if(!progress.isShowing()){
             progress.setTitle("Loading");
-            progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
+            progress.setCancelable(false);
             progress.show();
         }
     }
