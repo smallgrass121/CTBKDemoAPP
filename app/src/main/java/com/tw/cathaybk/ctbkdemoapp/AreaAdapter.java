@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.tw.cathaybk.ctbkdemoapp.db.area.AreaData;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -45,14 +46,15 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.ViewHolder> {
     public void onBindViewHolder(AreaAdapter.ViewHolder holder, int position) {
         final AreaData areaData = areaList.get(position);
         final String areaName = areaData.getE_Name();
-        final String img = areaData.getImage();
+        final String imgPath = areaData.getImage();
 
-        //TODO set true image
-      holder.image.setImageResource(R.mipmap.ic_launcher); //TODO get image
-//        holder.image.setImageURI(Uri.parse(areadata.getE_Pic_URL()));
-//        holder.image.setImageBitmap(
-//                getImageBitmap(areadata.getE_Pic_URL())
-//        );
+        if(null != imgPath && imgPath.length() > 0){
+            File imgFile = new File(imgPath);
+            if(imgFile.exists()){
+                Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+                holder.image.setImageBitmap(myBitmap);
+            }
+        }
 
         holder.areaName.setText(areaName);
         holder.areaDesc.setText(areaData.getE_Info());

@@ -2,6 +2,8 @@ package com.tw.cathaybk.ctbkdemoapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.tw.cathaybk.ctbkdemoapp.db.area.AreaData;
 import com.tw.cathaybk.ctbkdemoapp.db.plant.PlantData;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,14 +40,15 @@ public class PlantAdapter extends RecyclerView.Adapter<PlantAdapter.ViewHolder> 
     public void onBindViewHolder(PlantAdapter.ViewHolder holder, int position) {
         final PlantData plantData = plantDataList.get(position);
         final String plantName = plantData.getF_Name_Ch();
-        final String img = plantData.getImage();
+        final String imgPath = plantData.getImage();
 
-        //TODO set true image
-      holder.image.setImageResource(R.mipmap.ic_launcher); //TODO get image
-//        holder.image.setImageURI(Uri.parse(areadata.getE_Pic_URL()));
-//        holder.image.setImageBitmap(
-//                getImageBitmap(areadata.getE_Pic_URL())
-//        );
+        if(null != imgPath && imgPath.length() > 0){
+            File imgFile = new File(imgPath);
+            if(imgFile.exists()){
+                Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+                holder.image.setImageBitmap(myBitmap);
+            }
+        }
 
         holder.plantName.setText(plantName);
         holder.alsoknown.setText(plantData.getF_AlsoKnown());

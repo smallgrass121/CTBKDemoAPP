@@ -1,6 +1,8 @@
 package com.tw.cathaybk.ctbkdemoapp;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +17,7 @@ import androidx.fragment.app.Fragment;
 
 import com.tw.cathaybk.ctbkdemoapp.db.plant.PlantData;
 
+import java.io.File;
 import java.util.ArrayList;
 
 public class PlantDetailActivity extends Fragment {
@@ -64,6 +67,15 @@ public class PlantDetailActivity extends Fragment {
         plantFeature = (TextView) view.findViewById(R.id.tv_plant_feature);
         plantFuncApp = (TextView) view.findViewById(R.id.tv_plant_func_app);
         plantUpdate = (TextView) view.findViewById(R.id.tv_plant_update);
+
+        final String imgPath = plantData.getImage();
+        if(null != imgPath && imgPath.length() > 0){
+            File imgFile = new File(imgPath);
+            if(imgFile.exists()){
+                Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+                plantImage.setImageBitmap(myBitmap);
+            }
+        }
 
         plantNameInfo.setText(new StringBuilder(plantData.getF_Name_Ch()).append("\n").append(plantData.getF_Name_En()));
         plantAlsoknown.setText(new StringBuilder("別名").append("\n").append(plantData.getF_AlsoKnown()));

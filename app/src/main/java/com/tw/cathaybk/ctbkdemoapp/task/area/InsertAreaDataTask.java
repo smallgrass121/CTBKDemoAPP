@@ -6,6 +6,7 @@ import android.util.Log;
 import com.tw.cathaybk.ctbkdemoapp.db.area.AreaData;
 import com.tw.cathaybk.ctbkdemoapp.db.area.AreaDataDataBase;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class InsertAreaDataTask extends AsyncTask<List<AreaData>, Void, List<AreaData>> {
@@ -31,10 +32,10 @@ public class InsertAreaDataTask extends AsyncTask<List<AreaData>, Void, List<Are
 
                 final String id = list.get(i).getE_no();
                 final String url = list.get(i).getE_Pic_URL();
-//TODO download img
-//                if(null != id && null != url && url.startsWith("http")){
-//                    listener.onImgUrlFind(id, url);
-//                }
+
+                if(null != id && null != url && url.startsWith("http")){
+                    listener.onImgUrlFind(id, url);
+                }
             }
         }catch (Exception e) {
             e.printStackTrace();

@@ -2,6 +2,8 @@ package com.tw.cathaybk.ctbkdemoapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,10 +22,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.tw.cathaybk.ctbkdemoapp.db.area.AreaData;
 import com.tw.cathaybk.ctbkdemoapp.db.plant.PlantData;
+import com.tw.cathaybk.ctbkdemoapp.task.DownloadFileListener;
+import com.tw.cathaybk.ctbkdemoapp.task.DownloadFileTask;
 import com.tw.cathaybk.ctbkdemoapp.task.HttpGetRequestListener;
 import com.tw.cathaybk.ctbkdemoapp.task.HttpGetRequestTask;
+import com.tw.cathaybk.ctbkdemoapp.task.area.InsertAreaImgDataTask;
+import com.tw.cathaybk.ctbkdemoapp.task.area.InsertImgAreaDataListener;
+import com.tw.cathaybk.ctbkdemoapp.task.plant.InsertImgPlantDataListener;
 import com.tw.cathaybk.ctbkdemoapp.task.plant.InsertPlantDataListener;
 import com.tw.cathaybk.ctbkdemoapp.task.plant.InsertPlantDataTask;
+import com.tw.cathaybk.ctbkdemoapp.task.plant.InsertPlantImgDataTask;
 import com.tw.cathaybk.ctbkdemoapp.task.plant.SelectPlantDataListener;
 import com.tw.cathaybk.ctbkdemoapp.task.plant.SelectPlantDataTask;
 import com.tw.cathaybk.ctbkdemoapp.util.CSVFile;
@@ -32,12 +40,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PlantListActivity extends Fragment
-        implements HttpGetRequestListener, InsertPlantDataListener, SelectPlantDataListener {
+        implements HttpGetRequestListener, InsertPlantDataListener, SelectPlantDataListener, DownloadFileListener, InsertImgPlantDataListener {
 
     private Context context;
 
@@ -90,6 +99,15 @@ public class PlantListActivity extends Fragment
         areaInfo = (TextView) view.findViewById(R.id.tv_area_info);
         arealink = (TextView) view.findViewById(R.id.tv_area_link);
 
+        final String imgPath = areaData.getImage();
+        if(null != imgPath && imgPath.length() > 0){
+            File imgFile = new File(imgPath);
+            if(imgFile.exists()){
+                Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+                areaImage.setImageBitmap(myBitmap);
+            }
+        }
+
         areaDetail.setText(areaData.getE_Info());
 
         StringBuilder areaInfoData = new StringBuilder(areaData.getE_Memo()).
@@ -108,23 +126,6 @@ public class PlantListActivity extends Fragment
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
-
-        //temp data
-//        List<AreaData> memberList = new ArrayList();
-//
-//        AreaData ad = new AreaData();
-//        ad.setE_no("1");
-//        ad.setE_Name("1234");
-//        ad.setE_Memo("memo");
-//        ad.setE_Category("1234");
-//        ad.setE_URL("url");
-//        ad.setE_Geo("geo");
-//        ad.setE_Info("info");
-//        ad.setE_Pic_URL("pic");
-//
-//        memberList.add(ad);
-//        mAdapter = new AreaAdapter(context, memberList);
-//        mRecyclerView.setAdapter(mAdapter);
 
         this.requestPlantAPI(plantArea,true);
         //TODO request all/part btn
@@ -237,13 +238,6 @@ public class PlantListActivity extends Fragment
     }
 
     @Override
-    public void onImgRequestFinish(String id, String result) {
-        Log.i("onImgRequestFinish start, id=", id.toString());
-        Log.i("onImgRequestFinish start, result=", result.toString());
-//        new InsertPlantImgDataTask(context, this).execute(id, result);
-    }
-
-    @Override
     public void onRequestFail(String result) {
         Log.i("onRequestFail start, result=", result.toString());
         this.checkPlantDataDB();
@@ -322,7 +316,7 @@ public class PlantListActivity extends Fragment
     @Override
     public void onImgUrlFind(String id, String url) {
         Log.i("onImgUrlFind start:", "id = "+id+ " url = "+url);
-        new HttpGetRequestTask(this).execute(id, url, "IMG");
+        new DownloadFileTask(context, this).execute("PlantList", id, url);
     }
 
     private void requestPlantAPI(String plantArea, boolean requestAll){
@@ -330,17 +324,28 @@ public class PlantListActivity extends Fragment
         if(!requestAll){
             sbUrl.append("&limit=").append("10");
         }
-        new HttpGetRequestTask(this).execute(null, sbUrl.toString(), "API");
+        new HttpGetRequestTask(this).execute(sbUrl.toString());
     }
 
-//    @Override
-//    public void onInsertImgDataFinish(List<PlantData> selectResult) {
-//        mRecyclerView.setAdapter(new AreaAdapter(context, selectResult));
-//    }
+    @Override
+    public void onDownloadFinish(String name, String path) {
+        Log.i("onImgRequestFinish start, id=", name.toString());
+        Log.i("onImgRequestFinish start, path=", path);
+        new InsertPlantImgDataTask(context, this).execute(name, path);
+    }
 
-//    @Override
-//    public void onInsertImgDataFail(String result) {
-//
-//    }
+    @Override
+    public void onInsertImgDataFinish(List<PlantData> selectResult) {
+        mRecyclerView.setAdapter(new PlantAdapter(context, selectResult));
+    }
 
+    @Override
+    public void onInsertImgDataFail(String result) {
+
+    }
+
+    @Override
+    public void onDownloadFail(String result) {
+
+    }
 }

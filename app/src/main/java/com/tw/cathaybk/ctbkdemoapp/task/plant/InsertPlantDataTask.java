@@ -29,6 +29,13 @@ public class InsertPlantDataTask extends AsyncTask<List<PlantData>, Void, List<P
         try {
             for (int i=0; i<list.size(); i++) {
                 PlantDataDataBase.getInstance(context).getPlantDataDao().insert(list.get(i));
+
+                final String id = list.get(i).getF_Name_Ch();
+                final String url = list.get(i).getF_Pic01_URL();
+
+                if(null != id && null != url && url.startsWith("http")){
+                    listener.onImgUrlFind(id, url);
+                }
             }
         }catch (Exception e) {
             e.printStackTrace();

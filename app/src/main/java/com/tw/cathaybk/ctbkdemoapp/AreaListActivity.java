@@ -12,12 +12,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import com.tw.cathaybk.ctbkdemoapp.db.area.AreaData;
+import com.tw.cathaybk.ctbkdemoapp.task.DownloadFileListener;
+import com.tw.cathaybk.ctbkdemoapp.task.DownloadFileTask;
 import com.tw.cathaybk.ctbkdemoapp.task.HttpGetRequestListener;
 import com.tw.cathaybk.ctbkdemoapp.task.HttpGetRequestTask;
 import com.tw.cathaybk.ctbkdemoapp.task.area.InsertAreaDataListener;
 import com.tw.cathaybk.ctbkdemoapp.task.area.InsertAreaDataTask;
 import com.tw.cathaybk.ctbkdemoapp.task.area.InsertAreaImgDataTask;
-import com.tw.cathaybk.ctbkdemoapp.task.area.InsertImgDataListener;
+import com.tw.cathaybk.ctbkdemoapp.task.area.InsertImgAreaDataListener;
 import com.tw.cathaybk.ctbkdemoapp.task.area.SelectAreaDataListener;
 import com.tw.cathaybk.ctbkdemoapp.task.area.SelectAreaDataTask;
 import com.tw.cathaybk.ctbkdemoapp.util.CSVFile;
@@ -29,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AreaListActivity extends Fragment
-        implements HttpGetRequestListener, InsertAreaDataListener, SelectAreaDataListener, InsertImgDataListener {
+        implements HttpGetRequestListener, InsertAreaDataListener, SelectAreaDataListener, InsertImgAreaDataListener, DownloadFileListener {
 
     private Context context;
 
@@ -50,23 +52,6 @@ public class AreaListActivity extends Fragment
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
-
-        //temp data
-//        List<AreaData> memberList = new ArrayList();
-//
-//        AreaData ad = new AreaData();
-//        ad.setE_no("1");
-//        ad.setE_Name("1234");
-//        ad.setE_Memo("memo");
-//        ad.setE_Category("1234");
-//        ad.setE_URL("url");
-//        ad.setE_Geo("geo");
-//        ad.setE_Info("info");
-//        ad.setE_Pic_URL("pic");
-//
-//        memberList.add(ad);
-//        mAdapter = new AreaAdapter(context, memberList);
-//        mRecyclerView.setAdapter(mAdapter);
 
         /***
          * step 1.  一概透過api取得資料
@@ -152,10 +137,10 @@ public class AreaListActivity extends Fragment
     }
 
     @Override
-    public void onImgRequestFinish(String id, String result) {
+    public void onDownloadFinish(String id, String path) {
         Log.i("onImgRequestFinish start, id=", id.toString());
-        Log.i("onImgRequestFinish start, result=", result.toString());
-        new InsertAreaImgDataTask(context, this).execute(id, result);
+        Log.i("onImgRequestFinish start, path=", path);
+        new InsertAreaImgDataTask(context, this).execute(id, path);
     }
 
     @Override
@@ -209,11 +194,11 @@ public class AreaListActivity extends Fragment
     @Override
     public void onImgUrlFind(String id, String url) {
         Log.i("onImgUrlFind start:", "id = "+id+ " url = "+url);
-        new HttpGetRequestTask(this).execute(id, url, "IMG");
+        new DownloadFileTask(context, this).execute("AreaList", id, url);
     }
 
     private void requestAreaAPI(String url){
-        new HttpGetRequestTask(this).execute(null, url, "API");
+        new HttpGetRequestTask(this).execute(url);
     }
 
     @Override
@@ -223,6 +208,11 @@ public class AreaListActivity extends Fragment
 
     @Override
     public void onInsertImgDataFail(String result) {
+
+    }
+
+    @Override
+    public void onDownloadFail(String result) {
 
     }
 }
