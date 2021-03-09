@@ -2,6 +2,7 @@ package com.tw.cathaybk.ctbkdemoapp;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -15,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
@@ -27,8 +29,6 @@ import com.tw.cathaybk.ctbkdemoapp.task.DownloadFileListener;
 import com.tw.cathaybk.ctbkdemoapp.task.DownloadFileTask;
 import com.tw.cathaybk.ctbkdemoapp.task.HttpGetRequestListener;
 import com.tw.cathaybk.ctbkdemoapp.task.HttpGetRequestTask;
-import com.tw.cathaybk.ctbkdemoapp.task.area.InsertAreaImgDataTask;
-import com.tw.cathaybk.ctbkdemoapp.task.area.InsertImgAreaDataListener;
 import com.tw.cathaybk.ctbkdemoapp.task.plant.InsertImgPlantDataListener;
 import com.tw.cathaybk.ctbkdemoapp.task.plant.InsertPlantDataListener;
 import com.tw.cathaybk.ctbkdemoapp.task.plant.InsertPlantDataTask;
@@ -70,12 +70,12 @@ public class PlantListActivity extends Fragment
 
         ArrayList<AreaData> data =  getArguments().getParcelableArrayList("areaDataList");
         if(null == data || data.size() == 0 ) {
-            //TODO show error
+            showErrorDialog();
         }
 
         final AreaData areaData = data.get(0);
         if(null == areaData) {
-            //TODO show error
+            showErrorDialog();
         }
 
         plantArea = areaData.getE_Name();
@@ -85,7 +85,7 @@ public class PlantListActivity extends Fragment
         }
 
         if(null == plantArea || plantArea.length() == 0 ) {
-            //TODO show error
+            showErrorDialog();
         }
 
         Toolbar toolbar = (Toolbar) view.findViewById(R.id.detail_toolbar_plant);
@@ -139,13 +139,13 @@ public class PlantListActivity extends Fragment
     }
 
     private void checkPlantDataDB(){
-        showloading();
+        showLoading();
         new SelectPlantDataTask(context, this).execute(plantArea);
     }
 
     @Override
     public void onSelectPlantDataFinish(List<PlantData> selectResult) {
-        cancelloading();
+        cancelLoading();
         Log.i("onSelectPlantDataFinish start", "");
 
         if(null == selectResult || selectResult.size() == 0) {
@@ -160,7 +160,7 @@ public class PlantListActivity extends Fragment
 
     @Override
     public void onRequestFinish(String result) {
-        cancelloading();
+        cancelLoading();
         Log.i("onRequestFinish start, result=",result.toString());
 
         if(null != result){
@@ -237,33 +237,33 @@ public class PlantListActivity extends Fragment
 
     @Override
     public void onInsertPlantDataFinish(List<PlantData> selectResult) {
-        cancelloading();
+        cancelLoading();
         Log.i("onInsertPlantDataFinish start, selectResult=", selectResult.toString());
         mRecyclerView.setAdapter(new PlantAdapter(context, selectResult));
     }
 
     @Override
     public void onRequestFail(String result) {
-        cancelloading();
+        cancelLoading();
         Log.i("onRequestFail start, result=", result.toString());
         this.checkPlantDataDB();
     }
 
     @Override
     public void onInsertPlantDataFail(String result) {
-        cancelloading();
+        cancelLoading();
         Log.i("onInsertPlantDataFail start, result=", result.toString());
     }
 
 
     @Override
     public void onSelectPlantDataFail(String result) {
-        cancelloading();
+        cancelLoading();
         Log.i("onSelectPlantDataFail start, result=", result.toString());
     }
 
     private void importCSV(){
-        showloading();
+        showLoading();
         Log.i("importCSV start", "");
 
         InputStream inputStream = getResources().openRawResource(R.raw.plantdata_1090818);
@@ -324,14 +324,14 @@ public class PlantListActivity extends Fragment
 
     @Override
     public void onImgUrlFind(String id, String url) {
-        cancelloading();
-        showloading();
+        cancelLoading();
+        showLoading();
         Log.i("onImgUrlFind start:", "id = "+id+ " url = "+url);
         new DownloadFileTask(context, this).execute("PlantList", id, url);
     }
 
     private void requestPlantAPI(String plantArea, boolean requestAll){
-        showloading();
+        showLoading();
         StringBuilder sbUrl = new StringBuilder(getString(R.string.url_plant_data_api)).append("&q=").append(plantArea);
         if(!requestAll){
             sbUrl.append("&limit=").append("10");
@@ -341,7 +341,7 @@ public class PlantListActivity extends Fragment
 
     @Override
     public void onDownloadFinish(String name, String path) {
-        cancelloading();
+        cancelLoading();
         Log.i("onImgRequestFinish start, id=", name.toString());
         Log.i("onImgRequestFinish start, path=", path);
         new InsertPlantImgDataTask(context, this).execute(name, path);
@@ -349,21 +349,21 @@ public class PlantListActivity extends Fragment
 
     @Override
     public void onInsertImgDataFinish(List<PlantData> selectResult) {
-        cancelloading();
+        cancelLoading();
         mRecyclerView.setAdapter(new PlantAdapter(context, selectResult));
     }
 
     @Override
     public void onInsertImgDataFail(String result) {
-        cancelloading();
+        cancelLoading();
     }
 
     @Override
     public void onDownloadFail(String result) {
-        cancelloading();
+        cancelLoading();
     }
 
-    private void showloading() {
+    private void showLoading() {
         if(null == progress){
             progress = new ProgressDialog(context);
         }
@@ -375,9 +375,26 @@ public class PlantListActivity extends Fragment
         }
     }
 
-    private void cancelloading() {
+    private void cancelLoading() {
         if(null != progress && progress.isShowing()){
             progress.dismiss();
         }
+    }
+
+    public void showErrorDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+        android.content.DialogInterface.OnClickListener ocListener = new android.content.DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                getActivity().onBackPressed();
+            }
+        };
+
+        builder.setTitle("Error");
+        builder.setMessage("發生問題，請稍後再試，謝謝您。");
+        builder.setPositiveButton("OK", ocListener);
+        builder.setCancelable(false);
+        builder.show();
     }
 }

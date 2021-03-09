@@ -2,7 +2,10 @@ package com.tw.cathaybk.ctbkdemoapp;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
@@ -45,13 +48,12 @@ public class AreaListActivity extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         this.context = this.getContext();
-        showloading();
+        showLoading();
         View view = inflater.inflate(R.layout.activity_area_list, container,false);
 
         Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         getActivity().setTitle(getString(R.string.app_name));
-//        ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle(R.string.app_name);
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
@@ -74,13 +76,13 @@ public class AreaListActivity extends Fragment
     }
 
     private void checkAreaDataDB(){
-        showloading();
+        showLoading();
         new SelectAreaDataTask(context, this).execute();
     }
 
     @Override
     public void onSelectAreaDataFinish(List<AreaData> selectResult) {
-        cancelloading();
+        cancelLoading();
         Log.i("onSelectAreaDataFinish start", "");
 
         if(null == selectResult || selectResult.size() == 0) {
@@ -133,20 +135,20 @@ public class AreaListActivity extends Fragment
         }else{
             this.importCSV();
         }
-        cancelloading();
+        cancelLoading();
     }
 
     @Override
     public void onInsertAreaDataFinish(List<AreaData> selectResult) {
-        showloading();
+        showLoading();
         Log.i("onInsertAreaDataFinish start, selectResult=", selectResult.toString());
         mRecyclerView.setAdapter(new AreaAdapter(context, selectResult));
     }
 
     @Override
     public void onDownloadFinish(String id, String path) {
-        cancelloading();
-        showloading();
+        cancelLoading();
+        showLoading();
         Log.i("onImgRequestFinish start, id=", id.toString());
         Log.i("onImgRequestFinish start, path=", path);
         new InsertAreaImgDataTask(context, this).execute(id, path);
@@ -154,26 +156,27 @@ public class AreaListActivity extends Fragment
 
     @Override
     public void onRequestFail(String result) {
-        cancelloading();
+        cancelLoading();
         Log.i("onRequestFail start, result=", result.toString());
         this.checkAreaDataDB();
     }
 
     @Override
     public void onInsertAreaDataFail(String result) {
-        cancelloading();
+        cancelLoading();
         Log.i("onInsertAreaDataFail start, result=", result.toString());
+        showErrorDialog();
     }
 
 
     @Override
     public void onSelectAreaDataFail(String result) {
-        cancelloading();
+        cancelLoading();
         Log.i("onSelectAreaDataFail start, result=", result.toString());
     }
 
     private void importCSV(){
-        showloading();
+        showLoading();
         Log.i("importCSV start", "");
 
         InputStream inputStream = getResources().openRawResource(R.raw.areadata_20200206);
@@ -206,33 +209,33 @@ public class AreaListActivity extends Fragment
 
     @Override
     public void onImgUrlFind(String id, String url) {
-        showloading();
+        showLoading();
         Log.i("onImgUrlFind start:", "id = "+id+ " url = "+url);
         new DownloadFileTask(context, this).execute("AreaList", id, url);
     }
 
     private void requestAreaAPI(String url){
-        showloading();
+        showLoading();
         new HttpGetRequestTask(this).execute(url);
     }
 
     @Override
     public void onInsertImgDataFinish(List<AreaData> selectResult) {
         mRecyclerView.setAdapter(new AreaAdapter(context, selectResult));
-        cancelloading();
+        cancelLoading();
     }
 
     @Override
     public void onInsertImgDataFail(String result) {
-        cancelloading();
+        cancelLoading();
     }
 
     @Override
     public void onDownloadFail(String result) {
-        cancelloading();
+        cancelLoading();
     }
 
-    private void showloading() {
+    private void showLoading() {
         if(null == progress){
             progress = new ProgressDialog(context);
         }
@@ -244,9 +247,26 @@ public class AreaListActivity extends Fragment
         }
     }
 
-    private void cancelloading() {
+    private void cancelLoading() {
         if(null != progress && progress.isShowing()){
             progress.dismiss();
         }
+    }
+
+    public void showErrorDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+        android.content.DialogInterface.OnClickListener ocListener = new android.content.DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                getActivity().onBackPressed();
+            }
+        };
+
+        builder.setTitle("Error");
+        builder.setMessage("發生問題，請稍後再試，謝謝您。");
+        builder.setPositiveButton("OK", ocListener);
+        builder.setCancelable(false);
+        builder.show();
     }
 }
