@@ -27,10 +27,10 @@ public interface PlantDataDao {
     List<PlantData> selectAll();
 
     @Query("SELECT * FROM plantdata where F_Location LIKE '%' || :area || '%'")
-    List<PlantData> getALLByArea(String area);
+    List<PlantData> selectALLByArea(String area);
 
     @Query("SELECT * FROM plantdata where F_Name_Ch = :name")
-    List<PlantData> getALLByName(String name);
+    List<PlantData> selectALLByName(String name);
 
     @Query("SELECT image FROM plantdata where F_Name_Ch = :name")
     String getImageByName(String name);

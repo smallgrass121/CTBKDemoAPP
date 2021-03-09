@@ -4,11 +4,15 @@ import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.NavUtils;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -38,19 +42,30 @@ public class PlantListActivity extends Fragment
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
 
-    //TODO pass value
-    final private String plantArea = "蟲蟲探索谷";
+    private String plantArea;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        View view = inflater.inflate(R.layout.activity_plant_list, container,false);
         this.context = this.getContext();
-        View view = inflater.inflate(R.layout.activity_area_list, container,false);
 
-        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
+        plantArea =  getArguments().getString("areaName");
+
+        if(null == plantArea || plantArea.length() == 0 ) {
+            //TODO show error
+        }
+
+        Toolbar toolbar = (Toolbar) view.findViewById(R.id.detail_toolbar_plant);
+        getActivity().setTitle(plantArea);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-//        ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle(R.string.app_name);
+
+        // Show the Up button in the action bar.
+        ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
@@ -72,14 +87,16 @@ public class PlantListActivity extends Fragment
 //        mAdapter = new AreaAdapter(context, memberList);
 //        mRecyclerView.setAdapter(mAdapter);
 
-        this.requestPlantAPI(getString(R.string.url_plant_data_api) +"&q="+ plantArea);
+        this.requestPlantAPI(plantArea,true);
+        //TODO request all/part btn
+
         //this.checkAreaDataDB();
 
         return view;
     }
 
     private void checkPlantDataDB(){
-        new SelectPlantDataTask(context, this).execute();
+        new SelectPlantDataTask(context, this).execute(plantArea);
     }
 
     @Override
@@ -128,8 +145,12 @@ public class PlantListActivity extends Fragment
                     plantData.setF_pdf02_URL(itemObj.optString("F_pdf02_URL"));
                     plantData.setF_Pic02_URL(itemObj.optString("F_Pic02_URL"));
 
-                    String tmpeName = itemObj.optString("\uFEFFF_Name_Ch");
-                    plantData.setF_Name_Ch(tmpeName);
+                    String tempName = itemObj.optString("\uFEFFF_Name_Ch");
+                    if(tempName.equals("")){
+                        tempName = itemObj.optString("F_Name_Ch");
+
+                    }
+                    plantData.setF_Name_Ch(tempName);
 
                     plantData.setF_Keywords(itemObj.optString("F_Keywords"));
                     plantData.setF_Code(itemObj.optString("F_Code"));
@@ -266,8 +287,12 @@ public class PlantListActivity extends Fragment
         new HttpGetRequestTask(this).execute(id, url, "IMG");
     }
 
-    private void requestPlantAPI(String url){
-        new HttpGetRequestTask(this).execute(null, url, "API");
+    private void requestPlantAPI(String plantArea, boolean requestAll){
+        StringBuilder sbUrl = new StringBuilder(getString(R.string.url_plant_data_api)).append("&q=").append(plantArea);
+        if(!requestAll){
+            sbUrl.append("&limit=").append("10");
+        }
+        new HttpGetRequestTask(this).execute(null, sbUrl.toString(), "API");
     }
 
 //    @Override
@@ -279,4 +304,5 @@ public class PlantListActivity extends Fragment
 //    public void onInsertImgDataFail(String result) {
 //
 //    }
+
 }

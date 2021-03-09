@@ -30,7 +30,6 @@ public class InsertPlantDataTask extends AsyncTask<List<PlantData>, Void, List<P
             for (int i=0; i<list.size(); i++) {
                 Log.i("InsertPlantDataTask doInBackground I=", i+"");
                 PlantDataDataBase.getInstance(context).getPlantDataDao().insert(list.get(i));
-                Log.i("InsertPlantDataTask doInBackground selectResult=",PlantDataDataBase.getInstance(context).getPlantDataDao().selectAll().toString());
             }
         }catch (Exception e) {
             e.printStackTrace();

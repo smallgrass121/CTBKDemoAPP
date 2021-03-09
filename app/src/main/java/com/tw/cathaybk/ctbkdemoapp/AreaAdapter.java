@@ -1,6 +1,7 @@
 package com.tw.cathaybk.ctbkdemoapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -57,11 +58,20 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.ViewHolder> {
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-            Log.i("itemView onClick =", areaName);
+                Log.i("itemView onClick =", areaName);
 
+                Intent intent = new Intent(context, MainActivity.class);
+
+                //例外資料處理
+                if(areaName.contains(context.getString(R.string.area_pangolin))){
+                    intent.putExtra("areaName",context.getString(R.string.area_pangolin));
+                } else {
+                    intent.putExtra("areaName",areaName);
+                }
+                context.startActivity(intent);
+                v.setClickable(false);
             }
         });
-//        this.notifyDataSetChanged();
     }
 
     @Override

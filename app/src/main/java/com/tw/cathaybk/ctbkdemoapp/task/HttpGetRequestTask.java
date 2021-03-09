@@ -39,39 +39,52 @@ public class HttpGetRequestTask extends AsyncTask<String, Void, String> {
 
         String result;
         String inputLine;
+        BufferedReader reader = null;
+        InputStreamReader streamReader = null;
+
         try {
-            //Create a URL object holding our url
             URL myUrl = new URL(stringUrl);
-            //Create a connection
             HttpURLConnection connection =(HttpURLConnection)
                     myUrl.openConnection();
-            //Set methods and timeouts
             connection.setRequestMethod(REQUEST_METHOD);
             connection.setReadTimeout(READ_TIMEOUT);
             connection.setConnectTimeout(CONNECTION_TIMEOUT);
 
             //fix java.net.ProtocolException: unexpected end of stream
             connection.setRequestProperty("Connection", "close");
-
-            //Connect to our url
             connection.connect();
 
-            //Create a new InputStreamReader
-            InputStreamReader streamReader = new
-                    InputStreamReader(connection.getInputStream());
-            //Create a new buffered reader and String Builder
-            BufferedReader reader = new BufferedReader(streamReader);
+            streamReader = new InputStreamReader(connection.getInputStream());
+
+            reader = new BufferedReader(streamReader);
             StringBuilder stringBuilder = new StringBuilder();
-            //Check if the line we are reading is not null
+
             while((inputLine = reader.readLine()) != null){
                 stringBuilder.append(inputLine);
             }
-            reader.close();
-            streamReader.close();
             result = stringBuilder.toString();
+
         } catch(IOException e){
             e.printStackTrace();
             result = null;
+            listener.onRequestFail(e.getMessage());
+        } finally {
+            if(null != reader){
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    listener.onRequestFail(e.getMessage());
+                }
+            }
+            if(null != streamReader){
+                try {
+                    streamReader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    listener.onRequestFail(e.getMessage());
+                }
+            }
         }
         Log.i("HttpGetRequestTask doInBackground","end");
         return result;

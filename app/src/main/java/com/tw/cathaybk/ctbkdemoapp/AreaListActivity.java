@@ -45,6 +45,7 @@ public class AreaListActivity extends Fragment
 
         Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        getActivity().setTitle(getString(R.string.app_name));
 //        ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle(R.string.app_name);
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
@@ -141,7 +142,7 @@ public class AreaListActivity extends Fragment
                 e.printStackTrace();
             }
         }else{
-
+            this.importCSV();
         }
     }
 
@@ -163,7 +164,6 @@ public class AreaListActivity extends Fragment
         Log.i("onRequestFail start, result=", result.toString());
         this.checkAreaDataDB();
     }
-
 
     @Override
     public void onInsertAreaDataFail(String result) {
